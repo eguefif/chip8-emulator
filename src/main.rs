@@ -1,6 +1,9 @@
-use byteorder::{LittleEndian, ReadBytesExt};
+use crate::chip8::CPU;
 use clap::Parser;
 use std::fs::File;
+use std::io::prelude::*;
+
+pub mod chip8;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -9,18 +12,12 @@ struct Args {
     rom_file: String,
 }
 
-fn read_file(f: &mut File) -> std::vec::Vec<u16> {
-    let mut rom: Vec<u16> = vec![];
-    loop {
-        let result = f.read_u16::<LittleEndian>();
-        let instruction = match result {
-            Ok(byte) => byte,
-            Err(error) => {
-                eprintln!("Error while reading rom: {error:?}");
-                break;
-            }
-        };
-        rom.push(instruction);
+fn read_file(f: &mut File) -> std::vec::Vec<u8> {
+    let mut rom: Vec<u8> = vec![];
+    let mut buffer = [0; 1];
+
+    while f.read_exact(&mut buffer).is_ok() {
+        rom.push(buffer[0]);
     }
     rom
 }
@@ -31,7 +28,6 @@ fn main() {
 
     let mut f = File::open(&rom_filename).expect("Unable to open file.");
     let rom = read_file(&mut f);
-    for instruction in rom {
-        println!("{:0x}", instruction);
-    }
+    let cpu = CPU::new(rom);
+    println!("{:?}", cpu);
 }
