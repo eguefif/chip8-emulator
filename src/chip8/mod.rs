@@ -13,8 +13,8 @@ pub struct CPU {
     pub registers: [u8; 16],
     pub index: usize,
     pub pc: usize,
-    //pub stack: [u16; 16],
-    //pub sp: u8,
+    pub stack: [usize; 16],
+    pub sp: usize,
     pub memory: [u8; 4096],
     pub video_memory: [u8; VIDEO_MEMORY_SIZE],
 }
@@ -25,8 +25,8 @@ impl CPU {
             registers: [0; 16],
             index: 0,
             pc: 0x200,
-            //stack: [0; 16],
-            //sp: 0,
+            stack: [0; 16],
+            sp: 0,
             memory: [0; 4096],
             video_memory: [0; VIDEO_MEMORY_SIZE],
         };
@@ -50,15 +50,34 @@ impl CPU {
         opcode.display();
 
         match (opcode.code, opcode.x, opcode.y, opcode.d) {
+            (0x0, 0x0, 0x0, 0x0) => return 0,
             (0x0, 0x0, 0xE, 0x0) => self.video_memory = [0; VIDEO_MEMORY_SIZE],
+            (0x0, 0x0, 0xE, 0xE) => self.ret(),
             (0x1, _, _, _) => self.pc = opcode.nnn as usize,
+            (0x2, _, _, _) => self.call(opcode.nnn as usize),
             (0x6, _, _, _) => self.registers[opcode.x as usize] = opcode.kk,
             (0x7, _, _, _) => self.add_value(opcode.x as usize, opcode.kk),
             (0xA, _, _, _) => self.index = opcode.nnn as usize,
-            (0x0, 0x0, 0x0, 0x0) => return 0,
             (0xD, _, _, _) => self.draw_sprite(opcode.x, opcode.y, opcode.d),
             _ => eprintln!("Opcode not implement yet: {:?}.", opcode),
         }
         return 1;
+    }
+
+    fn call(self: &mut CPU, nnn: usize) {
+        if self.sp >= 16 {
+            panic!("Stack overflow");
+        }
+        self.stack[self.sp] = self.pc;
+        self.sp += 1;
+        self.pc = nnn;
+    }
+
+    fn ret(self: &mut CPU) {
+        if self.sp == 0 {
+            panic!("Stack underflow");
+        }
+        self.sp -= 1;
+        self.pc = self.stack[self.sp];
     }
 }

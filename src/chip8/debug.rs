@@ -16,8 +16,8 @@ pub fn display_debug(cpu: &mut CPU) {
             "video" => println!("{:?}", cpu.video_memory),
             "index" => println!("{:?}", cpu.index),
             "opcode" => println!("{:x?}", cpu.memory[cpu.pc]),
-            //"stack" => println!("{:?}", cpu.stack),
-            //"sp" => println!("{:?}", cpu.sp),
+            "stack" => println!("{:?}", cpu.stack),
+            "sp" => println!("{:?}", cpu.sp),
             _ => return,
         }
     }
