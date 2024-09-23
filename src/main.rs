@@ -1,19 +1,15 @@
-use crate::graphics::{draw_screen, get_windows};
+use crate::graphics::get_windows;
 use crate::init::get_cpu;
+use crate::main_loop::main_loop;
 
 mod chip8;
 mod config;
 mod graphics;
 mod init;
+mod main_loop;
 
 fn main() {
     let mut window = get_windows();
     let mut cpu = get_cpu();
-    while let Some(event) = window.next() {
-        if cpu.run() == 0 {
-            break;
-        }
-        let image = cpu.video_memory;
-        draw_screen(&mut window, event, image);
-    }
+    main_loop(&mut window, &mut cpu);
 }
