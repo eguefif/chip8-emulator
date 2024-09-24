@@ -30,29 +30,4 @@ impl CPU {
             self.pc += 2;
         }
     }
-
-    #[allow(unused_variables)]
-    pub fn skip_if_key_pressed(self: &mut CPU, vx: usize) {
-        eprintln!("not implemented");
-        self.pc += 2;
-    }
-
-    #[allow(unused_variables)]
-    pub fn skip_if_key_not_pressed(self: &mut CPU, vx: usize) {
-        eprintln!("not implemented");
-        self.pc += 2;
-    }
-
-    #[allow(unused_variables)]
-    pub fn wait_for_key(self: &mut CPU) {
-        eprintln!("not implemented");
-    }
-
-    pub fn set_delay_timer(self: &mut CPU, vx: usize) {
-        self.delay_timer = self.registers[vx];
-    }
-
-    pub fn set_sound_timer(self: &mut CPU, vx: usize) {
-        self.sound_timer = self.registers[vx];
-    }
 }

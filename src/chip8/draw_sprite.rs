@@ -2,7 +2,7 @@ use crate::chip8::CPU;
 use crate::config::*;
 
 impl CPU {
-    pub fn draw_sprite(self: &mut CPU, vx: u8, vy: u8, d: u8) {
+    pub fn draw_sprite(self: &mut CPU, vx: usize, vy: usize, d: u8) {
         self.reset_collision_flag();
         let (x, y) = self.get_coordinate(vx, vy);
         let sprite = self.load_sprite(d as usize);
@@ -13,8 +13,8 @@ impl CPU {
         self.registers[0xF] = 0;
     }
 
-    fn get_coordinate(self: &mut CPU, vx: u8, vy: u8) -> (usize, usize) {
-        let x = self.registers[vx as usize] as usize;
+    fn get_coordinate(self: &mut CPU, vx: usize, vy: usize) -> (usize, usize) {
+        let x = self.registers[vx] as usize;
         let y = self.registers[vy as usize] as usize;
         (x, y)
     }
