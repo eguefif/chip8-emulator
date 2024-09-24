@@ -7,7 +7,9 @@ impl CPU {
         let last = self.registers[vx] as usize;
 
         for x in 0..=last {
-            self.memory[self.index + x] = self.registers[x];
+            if last < 16 {
+                self.memory[self.index + x] = self.registers[x];
+            }
         }
     }
 
@@ -15,7 +17,9 @@ impl CPU {
         let last = self.registers[vx] as usize;
 
         for x in 0..=last {
-            self.registers[x] = self.memory[self.index + x];
+            if last < 16 {
+                self.registers[x] = self.memory[self.index + x];
+            }
         }
     }
 
