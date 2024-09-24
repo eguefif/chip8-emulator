@@ -310,6 +310,7 @@ dependencies = [
  "clap",
  "piston2d-graphics 0.45.0",
  "piston_window",
+ "rand",
 ]
 
 [[package]]
