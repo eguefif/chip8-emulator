@@ -57,6 +57,10 @@ impl CPU {
 
     pub fn run(self: &mut CPU) -> u8 {
         let opcode: Opcode = Opcode::new(self.memory[self.pc], self.memory[self.pc + 1]);
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+            return 1;
+        }
         self.pc += 2;
 
         opcode.display();
