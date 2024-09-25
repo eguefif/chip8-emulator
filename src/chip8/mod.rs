@@ -1,5 +1,8 @@
 #![allow(clippy::all)]
 
+use piston_window::Key;
+
+use crate::chip8::keyboard::Keyboard;
 use crate::chip8::opcode::Opcode;
 use crate::config::*;
 
@@ -22,6 +25,7 @@ pub struct CPU {
     pub video_memory: [u8; VIDEO_MEMORY_SIZE],
     pub delay_timer: u8,
     pub sound_timer: u8,
+    pub keyboard: Keyboard,
 }
 
 impl CPU {
@@ -36,6 +40,7 @@ impl CPU {
             video_memory: [0; VIDEO_MEMORY_SIZE],
             delay_timer: 0,
             sound_timer: 0,
+            keyboard: Keyboard::new(),
         };
         let mut position = 0x200;
 
@@ -83,7 +88,7 @@ impl CPU {
             (0xD, _, _, _) => self.draw_sprite(opcode.x, opcode.y, opcode.d),
             (0xE, _, 0x9, 0xE) => self.skip_if_key_pressed(opcode.x),
             (0xE, _, 0xA, 0x1) => self.skip_if_key_not_pressed(opcode.x),
-            (0xF, _, 0x0, 0xA) => self.wait_for_key(),
+            (0xF, _, 0x0, 0xA) => self.wait_for_key(opcode.x),
             (0xF, _, 0x1, 0x5) => self.set_delay_timer(opcode.x),
             (0xF, _, 0x1, 0x8) => self.set_sound_timer(opcode.x),
             (0xF, _, 0x2, 0x9) => self.set_font(opcode.x),
@@ -93,5 +98,9 @@ impl CPU {
             _ => eprintln!("Opcode not implement yet: {:?}.", opcode),
         }
         return 1;
+    }
+
+    pub fn update_keyboard(self: &mut CPU, key: Key) {
+        self.keyboard.toggle_key(key);
     }
 }
