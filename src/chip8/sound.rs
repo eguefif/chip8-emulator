@@ -13,8 +13,8 @@ impl CPU {
 
             // Add a dummy source of the sake of the example.
             let source = SineWave::new(440.0)
-                .take_duration(Duration::from_secs_f32(0.016))
-                .amplify(0.20);
+                .take_duration(Duration::from_secs_f32(0.001))
+                .amplify(0.80);
             sink.append(source);
 
             // The sound plays in a separate thread. This call will block the current thread until the sink

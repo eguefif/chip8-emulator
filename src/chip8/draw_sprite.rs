@@ -15,29 +15,22 @@ impl CPU {
 
     fn get_coordinate(self: &mut CPU, vx: usize, vy: usize) -> (usize, usize) {
         let x = self.registers[vx] as usize;
-        let y = self.registers[vy as usize] as usize;
+        let y = self.registers[vy] as usize;
         (x, y)
     }
 
     fn load_sprite(self: &mut CPU, d: usize) -> Vec<u8> {
-        let end: usize = self.index + d;
-        let mut sprite: Vec<u8> = vec![0; d as usize];
-        let mut i = 0;
-
-        for position in self.index..end {
-            sprite[i] = self.memory[position];
-            i += 1;
-        }
-        sprite
+        self.memory[self.index..(self.index + d)].to_vec()
     }
 
     fn draw_sprite_in_video_memory(self: &mut CPU, sprite: Vec<u8>, x: usize, y: usize) {
-        let mut position: usize = y * VM_LINE_SIZE as usize + x;
+        let mut position: usize =
+            (y % VM_COL_SIZE as usize) * VM_LINE_SIZE as usize + (x % VM_LINE_SIZE as usize);
         for byte in sprite {
             if self.is_out_of_memory(position) {
                 break;
             }
-            self.draw_byte(byte, position, x);
+            self.draw_byte(byte, position, x % VM_LINE_SIZE as usize);
             position += VM_LINE_SIZE as usize;
         }
     }
@@ -51,9 +44,9 @@ impl CPU {
             if self.is_out_of_line(x + byte_x) {
                 break;
             }
-            let p = position + 8 - byte_x as usize;
+            let p = position + byte_x;
             let value = self.video_memory[p];
-            let xor_value = (byte >> byte_x) & 0x1;
+            let xor_value = (byte >> (7 - byte_x)) & 0x1;
             self.video_memory[p] = value ^ xor_value;
             self.check_collision(value, xor_value);
         }

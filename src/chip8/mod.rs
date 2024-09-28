@@ -104,6 +104,7 @@ impl CPU {
             (0xE, _, 0x9, 0xE) => self.skip_if_key_pressed(opcode.x),
             (0xE, _, 0xA, 0x1) => self.skip_if_key_not_pressed(opcode.x),
             (0xF, _, 0x0, 0xA) => self.wait_for_key(opcode.x),
+            (0xF, _, 0x0, 0x7) => self.registers[opcode.x] = self.delay_timer,
             (0xF, _, 0x1, 0x5) => self.set_delay_timer(opcode.x),
             (0xF, _, 0x1, 0x8) => self.set_sound_timer(opcode.x),
             (0xF, _, 0x1, 0xE) => self.index += self.registers[opcode.x] as usize,
@@ -111,13 +112,13 @@ impl CPU {
             (0xF, _, 0x3, 0x3) => self.set_bcd(opcode.x),
             (0xF, _, 0x5, 0x5) => self.save_registers(opcode.x),
             (0xF, _, 0x6, 0x5) => self.read_registers(opcode.x),
-            _ => eprintln!("Opcode not implement yet: {:?}.", opcode),
+            _ => eprintln!("Opcode not implemented yet: {:x?}.", opcode),
         }
         return 1;
     }
 
-    pub fn update_keyboard(self: &mut CPU, key: Key) {
-        self.keyboard.toggle_key(key);
+    pub fn update_keyboard(self: &mut CPU, key: Key, value: bool) {
+        self.keyboard.set_key(key, value);
     }
 
     pub fn toggle_debug(self: &mut CPU) {
