@@ -1,14 +1,12 @@
-use std::{fs::File, io::BufReader, time::Duration};
+use std::time::Duration;
 
-use rodio::{source::SineWave, Decoder, Sink, Source};
+use rodio::{source::SineWave, Sink, Source};
 
 use crate::chip8::CPU;
 
 impl CPU {
     pub fn start_sound(self: &mut CPU, stream_handle: rodio::OutputStreamHandle) {
         self.sink = Sink::try_new(&stream_handle).unwrap();
-        //let file = BufReader::new(File::open("./assets/beep.wav").unwrap());
-        //let source = Decoder::new(file).unwrap();
     }
     pub fn handle_sound(self: &mut CPU) {
         if self.sound_timer > 0 {
