@@ -18,7 +18,7 @@ impl CPU {
     pub fn wait_for_key(self: &mut CPU, vx: usize) {
         let mut key = 0;
 
-        if !self.keyboard.is_a_key_pressed(&mut key) {
+        if !self.keyboard.is_a_key_pressed_and_realese(&mut key) {
             self.pc -= 2;
         } else {
             self.registers[vx] = key as u8;
@@ -29,11 +29,15 @@ impl CPU {
 #[derive(Debug)]
 pub struct Keyboard {
     pub keys: [bool; 16],
+    pressed_key: u8,
 }
 
 impl Keyboard {
     pub fn new() -> Self {
-        Self { keys: [false; 16] }
+        Self {
+            keys: [false; 16],
+            pressed_key: 20,
+        }
     }
 
     pub fn set_key(self: &mut Keyboard, key: Key, value: bool) {
@@ -45,10 +49,13 @@ impl Keyboard {
         self.keys[key as usize]
     }
 
-    pub fn is_a_key_pressed(self: &mut Keyboard, reg: &mut usize) -> bool {
+    pub fn is_a_key_pressed_and_realese(self: &mut Keyboard, reg: &mut usize) -> bool {
         for (i, key) in self.keys.iter().enumerate() {
             if *key {
+                self.pressed_key = i as u8;
+            } else if self.pressed_key == i as u8 {
                 *reg = i;
+                self.pressed_key = 20;
                 return true;
             }
         }

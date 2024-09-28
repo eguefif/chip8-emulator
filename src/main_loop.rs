@@ -10,16 +10,20 @@ static CLOCK_DURATION: Duration = Duration::from_millis(1);
 pub fn main_loop(window: &mut PistonWindow, cpu: &mut CPU) {
     while let Some(event) = window.next() {
         let now = Instant::now();
-        if let Some(Button::Keyboard(key)) = event.press_args() {
-            cpu.update_keyboard(key, true);
-        }
-        if let Some(Button::Keyboard(key)) = event.release_args() {
-            cpu.update_keyboard(key, false);
-        }
+        handle_keyboard(cpu, &event);
         if cpu.run() == 0 {
             break;
         }
         draw_screen(window, event, cpu.video_memory);
         while now.elapsed() <= CLOCK_DURATION {}
+    }
+}
+
+fn handle_keyboard(cpu: &mut CPU, event: &Event) {
+    if let Some(Button::Keyboard(key)) = event.press_args() {
+        cpu.update_keyboard(key, true);
+    }
+    if let Some(Button::Keyboard(key)) = event.release_args() {
+        cpu.update_keyboard(key, false);
     }
 }
