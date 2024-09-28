@@ -1,7 +1,9 @@
 #![allow(clippy::all)]
 
+use debug::display_debug;
 use piston_window::Key;
 
+use crate::chip8::font::write_fonts_in_memory;
 use crate::chip8::keyboard::Keyboard;
 use crate::chip8::opcode::Opcode;
 use crate::config::*;
@@ -9,9 +11,11 @@ use crate::config::*;
 mod conditional;
 mod debug;
 mod draw_sprite;
+mod font;
 mod keyboard;
 mod op_math;
 mod opcode;
+mod sound;
 mod system;
 
 #[derive(Debug)]
@@ -26,6 +30,7 @@ pub struct CPU {
     pub delay_timer: u8,
     pub sound_timer: u8,
     pub keyboard: Keyboard,
+    pub debug: bool,
 }
 
 impl CPU {
@@ -41,9 +46,11 @@ impl CPU {
             delay_timer: 0,
             sound_timer: 0,
             keyboard: Keyboard::new(),
+            debug: false,
         };
         let mut position = 0x200;
 
+        write_fonts_in_memory(&mut cpu.memory);
         for byte in rom {
             cpu.memory[position] = byte;
             position += 1;
@@ -61,9 +68,13 @@ impl CPU {
             self.delay_timer -= 1;
             return 1;
         }
+        self.handle_sound();
         self.pc += 2;
 
-        opcode.display();
+        if self.debug {
+            opcode.display();
+            display_debug(self);
+        }
 
         match (opcode.code, opcode.x, opcode.y, opcode.d) {
             (0x0, 0x0, 0x0, 0x0) => return 0,
@@ -95,6 +106,7 @@ impl CPU {
             (0xF, _, 0x0, 0xA) => self.wait_for_key(opcode.x),
             (0xF, _, 0x1, 0x5) => self.set_delay_timer(opcode.x),
             (0xF, _, 0x1, 0x8) => self.set_sound_timer(opcode.x),
+            (0xF, _, 0x1, 0xE) => self.index += self.registers[opcode.x] as usize,
             (0xF, _, 0x2, 0x9) => self.set_font(opcode.x),
             (0xF, _, 0x3, 0x3) => self.set_bcd(opcode.x),
             (0xF, _, 0x5, 0x5) => self.save_registers(opcode.x),
@@ -106,5 +118,9 @@ impl CPU {
 
     pub fn update_keyboard(self: &mut CPU, key: Key) {
         self.keyboard.toggle_key(key);
+    }
+
+    pub fn toggle_debug(self: &mut CPU) {
+        self.debug = !self.debug;
     }
 }

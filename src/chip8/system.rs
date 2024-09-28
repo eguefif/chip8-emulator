@@ -4,21 +4,17 @@ const FONTSET_START_ADDRESS: usize = 0x50;
 
 impl CPU {
     pub fn save_registers(self: &mut CPU, vx: usize) {
-        let last = self.registers[vx] as usize;
-
-        for x in 0..=last {
-            if last < 16 {
+        for x in 0..=vx {
+            if x < 16 {
                 self.memory[self.index + x] = self.registers[x];
             }
         }
     }
 
     pub fn read_registers(self: &mut CPU, vx: usize) {
-        let last = self.registers[vx] as usize;
-
-        for x in 0..=last {
-            if last < 16 {
-                self.registers[x] = self.memory[self.index + x];
+        for i in 0..=vx {
+            if i < 16 {
+                self.registers[i] = self.memory[self.index + i];
             }
         }
     }

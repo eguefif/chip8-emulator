@@ -55,7 +55,7 @@ impl CPU {
             let value = self.video_memory[p];
             let xor_value = (byte >> byte_x) & 0x1;
             self.video_memory[p] = value ^ xor_value;
-            self.check_collision(value, self.video_memory[p]);
+            self.check_collision(value, xor_value);
         }
     }
 
@@ -63,8 +63,8 @@ impl CPU {
         x > (VM_LINE_SIZE as usize)
     }
 
-    fn check_collision(self: &mut CPU, value: u8, new_value: u8) {
-        if value >= 1 && new_value == 0 {
+    fn check_collision(self: &mut CPU, value: u8, byte_value: u8) {
+        if value >= 1 && byte_value >= 1 {
             self.registers[0xF] = 1;
         }
     }

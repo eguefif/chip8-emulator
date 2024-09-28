@@ -18,6 +18,7 @@ pub fn display_debug(cpu: &mut CPU) {
             "opcode" => println!("{:x?}", cpu.memory[cpu.pc]),
             "stack" => println!("{:?}", cpu.stack),
             "sp" => println!("{:?}", cpu.sp),
+            "q" => cpu.toggle_debug(),
             _ => return,
         }
     }
