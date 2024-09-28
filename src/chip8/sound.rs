@@ -1,25 +1,21 @@
+use std::{fs::File, io::BufReader, time::Duration};
+
+use rodio::{source::SineWave, Decoder, Sink, Source};
+
 use crate::chip8::CPU;
 
-use rodio::source::{SineWave, Source};
-use rodio::{OutputStream, Sink};
-use std::time::Duration;
-
 impl CPU {
+    pub fn start_sound(self: &mut CPU, stream_handle: rodio::OutputStreamHandle) {
+        self.sink = Sink::try_new(&stream_handle).unwrap();
+        //let file = BufReader::new(File::open("./assets/beep.wav").unwrap());
+        //let source = Decoder::new(file).unwrap();
+    }
     pub fn handle_sound(self: &mut CPU) {
         if self.sound_timer > 0 {
-            // _stream must live as long as the sink
-            let (_stream, stream_handle) = OutputStream::try_default().unwrap();
-            let sink = Sink::try_new(&stream_handle).unwrap();
-
-            // Add a dummy source of the sake of the example.
-            let source = SineWave::new(440.0)
-                .take_duration(Duration::from_secs_f32(0.001))
-                .amplify(0.80);
-            sink.append(source);
-
-            // The sound plays in a separate thread. This call will block the current thread until the sink
-            // has finished playing all its queued sounds.
-            sink.sleep_until_end();
+            let duration = Duration::from_millis(18);
+            let source = SineWave::new(440.0).take_duration(duration);
+            self.sink.append(source);
+            self.sound_timer -= 1;
         }
     }
 }

@@ -5,7 +5,7 @@ use crate::graphics::draw_screen;
 
 use piston_window::*;
 
-static CLOCK_DURATION: Duration = Duration::from_millis(1);
+static CLOCK_DURATION: Duration = Duration::from_millis(16);
 
 pub fn main_loop(window: &mut PistonWindow, cpu: &mut CPU) {
     while let Some(event) = window.next() {

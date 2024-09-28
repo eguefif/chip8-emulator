@@ -2,6 +2,7 @@
 
 use debug::display_debug;
 use piston_window::Key;
+use rodio::Sink;
 
 use crate::chip8::font::write_fonts_in_memory;
 use crate::chip8::keyboard::Keyboard;
@@ -18,7 +19,6 @@ mod opcode;
 mod sound;
 mod system;
 
-#[derive(Debug)]
 pub struct CPU {
     pub registers: [u8; 16],
     pub index: usize,
@@ -31,10 +31,12 @@ pub struct CPU {
     pub sound_timer: u8,
     pub keyboard: Keyboard,
     pub debug: bool,
+    pub sink: Sink,
 }
 
 impl CPU {
     pub fn new(rom: Vec<u8>) -> CPU {
+        let (sink, _) = Sink::new_idle();
         let mut cpu = CPU {
             registers: [0; 16],
             index: 0,
@@ -47,6 +49,7 @@ impl CPU {
             sound_timer: 0,
             keyboard: Keyboard::new(),
             debug: false,
+            sink,
         };
         let mut position = 0x200;
 
@@ -58,7 +61,6 @@ impl CPU {
                 break;
             }
         }
-
         cpu
     }
 
